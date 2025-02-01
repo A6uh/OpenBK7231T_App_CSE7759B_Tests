@@ -30,6 +30,7 @@ void logUARTBuffer() {
     }
 }
 
+
 int CSE7766_TryToGetNextCSE7766Packet() {
 	int cs;
 	int i;
