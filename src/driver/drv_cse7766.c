@@ -19,6 +19,17 @@
 
 #define CSE7766_BAUD_RATE 4800
 
+void logUARTBuffer() {
+    int cs = UART_GetDataSize();
+    if (cs > 0) {
+        addLogAdv(LOG_INFO, LOG_FEATURE_ENERGYMETER, "UART Buffer (%d bytes):", cs);
+        for (int i = 0; i < cs && i < 32; i++) { // Limit to 32 bytes to avoid flooding logs
+            addLogAdv(LOG_INFO, LOG_FEATURE_ENERGYMETER, "%02X ", UART_GetByte(i));
+        }
+        addLogAdv(LOG_INFO, LOG_FEATURE_ENERGYMETER, "\n");
+    }
+}
+
 int CSE7766_TryToGetNextCSE7766Packet() {
 	int cs;
 	int i;
@@ -30,6 +41,7 @@ int CSE7766_TryToGetNextCSE7766Packet() {
 
 	cs = UART_GetDataSize();
 
+	logUARTBuffer();
 
 	if(cs < CSE7766_PACKET_LEN) {
 		return 0;
