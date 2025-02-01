@@ -22,13 +22,23 @@
 void logUARTBuffer() {
     int cs = UART_GetDataSize();
     if (cs > 0) {
-        addLogAdv(LOG_INFO, LOG_FEATURE_ENERGYMETER, "UART Buffer (%d bytes):", cs);
-        for (int i = 0; i < cs && i < 32; i++) { // Limit to 32 bytes to avoid flooding logs
-            addLogAdv(LOG_INFO, LOG_FEATURE_ENERGYMETER, "%02X ", UART_GetByte(i));
+        if (cs > 96) {
+            cs = 96;  // Limit to 96 bytes
         }
-        addLogAdv(LOG_INFO, LOG_FEATURE_ENERGYMETER, "\n");
+
+        char buffer_for_log[290];  // 96 bytes * 3 (hex + space) + null terminator
+        char buffer2[4];  // Temporary buffer for hex conversion
+        buffer_for_log[0] = '\0';
+
+        for (int i = 0; i < cs; i++) {
+            snprintf(buffer2, sizeof(buffer2), "%02X ", UART_GetByte(i));
+            strcat_safe(buffer_for_log, buffer2, sizeof(buffer_for_log));
+        }
+
+        addLogAdv(LOG_INFO, LOG_FEATURE_ENERGYMETER, "UART Buffer (%d bytes): %s\n", cs, buffer_for_log);
     }
 }
+
 
 
 int CSE7766_TryToGetNextCSE7766Packet() {
